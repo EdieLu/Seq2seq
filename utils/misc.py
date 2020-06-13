@@ -16,6 +16,7 @@ def check_device(use_gpu):
 
 	""" set device """
 	# import pdb; pdb.set_trace()
+	# assert torch.cuda.is_available()
 	if use_gpu and torch.cuda.is_available():
 		device = torch.device('cuda')
 	else:

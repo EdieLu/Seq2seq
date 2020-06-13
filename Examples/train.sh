@@ -2,45 +2,62 @@
 #$ -S /bin/bash
 
 echo $HOSTNAME
+unset LD_PRELOAD
 export PATH=/home/mifs/ytl28/anaconda3/bin/:$PATH
 
-export CUDA_VISIBLE_DEVICES=1
+export CUDA_VISIBLE_DEVICES=0
 # export CUDA_VISIBLE_DEVICES=$X_SGE_CUDA_DEVICE
 echo $CUDA_VISIBLE_DEVICES
 
 # python 3.6
-# pytorch 1.1
+# pytorch 1.3
 source activate py13-cuda9
 export PYTHONBIN=/home/mifs/ytl28/anaconda3/envs/py13-cuda9/bin/python3
+# source activate pt11-cuda9
+# export PYTHONBIN=/home/mifs/ytl28/anaconda3/envs/pt11-cuda9/bin/python3
 
 # ------------------------ DIR --------------------------
-savedir=models/en-de-v001/
-train_path_src=../lib/mustc-en-de-proc/train/train.en
-train_path_tgt=../lib/mustc-en-de-proc/train/train.de
-dev_path_src=../lib/mustc-en-de-proc/dev/dev.en
-dev_path_tgt=../lib/mustc-en-de-proc/dev/dev.de
-# dev_path_src=None
-# dev_path_tgt=None
-path_vocab_src=../lib/mustc-en-de-proc/vocab/en-bpe-30000/vocab
-path_vocab_tgt=../lib/mustc-en-de-proc/vocab/de-bpe-30000/vocab
-load_embedding_src=None
-load_embedding_tgt=None
+savedir=models/gec-v016/
+train_path_src=/home/alta/BLTSpeaking/exp-ytl28/projects/lib/clc/train.src.nodot
+train_path_tgt=/home/alta/BLTSpeaking/exp-ytl28/projects/lib/clc/train.tgt.nodot
+# dev_path_src=/home/alta/BLTSpeaking/exp-ytl28/projects/lib/clc/dev.src
+# dev_path_tgt=/home/alta/BLTSpeaking/exp-ytl28/projects/lib/clc/dev.tgt
+dev_path_src=None
+dev_path_tgt=None
+path_vocab_src=/home/alta/BLTSpeaking/exp-ytl28/encdec/lib/vocab/clctotal+swbd.min-count4.en
+path_vocab_tgt=/home/alta/BLTSpeaking/exp-ytl28/encdec/lib/vocab/clctotal+swbd.min-count4.en
 use_type='word'
+load_embedding_src=/home/alta/BLTSpeaking/exp-ytl28/encdec/lib/embeddings/glove.6B.200d.txt
+load_embedding_tgt=/home/alta/BLTSpeaking/exp-ytl28/encdec/lib/embeddings/glove.6B.200d.txt
+share_embedder=True
+
+# ------------------------ MODEL --------------------------
+embedding_size_enc=200
+embedding_size_dec=200
+hidden_size_enc=200
+hidden_size_dec=200
+hidden_size_shared=200
+num_bilstm_enc=2
+num_unilstm_dec=4
+att_mode=bilinear # bahdanau | bilinear
 
 # ------------------------ TRAIN --------------------------
 # checkpoint_every=5
 # print_every=2
-checkpoint_every=1000
-print_every=200
+checkpoint_every=6000
+print_every=1000
 
-batch_size=200
-max_seq_len=50
-num_epochs=30
-random_seed=300
+batch_size=256
+max_seq_len=32
+minibatch_split=1
+num_epochs=20
+
+random_seed=2020
 eval_with_mask=True
-max_count_no_improve=2
+max_count_no_improve=5
 max_count_num_rollback=2
 keep_num=2
+normalise_loss=True
 
 $PYTHONBIN /home/alta/BLTSpeaking/exp-ytl28/local-ytl/nmt-base/train.py \
 	--train_path_src $train_path_src \
@@ -54,17 +71,18 @@ $PYTHONBIN /home/alta/BLTSpeaking/exp-ytl28/local-ytl/nmt-base/train.py \
 	--use_type $use_type \
 	--save $savedir \
 	--random_seed $random_seed \
-	--embedding_size_enc 200 \
-	--embedding_size_dec 200 \
-	--hidden_size_enc 200 \
-	--num_bilstm_enc 2 \
+	--share_embedder $share_embedder \
+	--embedding_size_enc $embedding_size_enc \
+	--embedding_size_dec $embedding_size_dec \
+	--hidden_size_enc $hidden_size_enc \
+	--num_bilstm_enc $num_bilstm_enc \
 	--num_unilstm_enc 0 \
-	--hidden_size_dec 200 \
-	--num_unilstm_dec 4 \
+	--hidden_size_dec $hidden_size_dec \
+	--num_unilstm_dec $num_unilstm_dec \
 	--hidden_size_att 10 \
-	--att_mode bilinear \
+	--att_mode $att_mode \
 	--residual True \
-	--hidden_size_shared 200 \
+	--hidden_size_shared $hidden_size_shared \
 	--max_seq_len $max_seq_len \
 	--batch_size $batch_size \
 	--batch_first True \
@@ -83,3 +101,5 @@ $PYTHONBIN /home/alta/BLTSpeaking/exp-ytl28/local-ytl/nmt-base/train.py \
 	--max_count_no_improve $max_count_no_improve \
 	--max_count_num_rollback $max_count_num_rollback \
 	--keep_num $keep_num \
+	--normalise_loss $normalise_loss \
+	--minibatch_split $minibatch_split \

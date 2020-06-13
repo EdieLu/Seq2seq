@@ -35,7 +35,9 @@ class Trainer(object):
 		teacher_forcing_ratio=0.0,
 		max_count_no_improve=2,
 		max_count_num_rollback=2,
-		keep_num=1
+		keep_num=1,
+		normalise_loss=True,
+		minibatch_split=1
 		):
 
 		self.use_gpu = use_gpu
@@ -53,6 +55,7 @@ class Trainer(object):
 		self.max_count_no_improve = max_count_no_improve
 		self.max_count_num_rollback = max_count_num_rollback
 		self.keep_num = keep_num
+		self.normalise_loss = normalise_loss
 
 		if not os.path.isabs(expt_dir):
 			expt_dir = os.path.join(os.getcwd(), expt_dir)
@@ -64,8 +67,9 @@ class Trainer(object):
 		self.logger = logging.getLogger(__name__)
 		self.writer = torch.utils.tensorboard.writer.SummaryWriter(log_dir=self.expt_dir)
 
+		self.minibatch_split = minibatch_split
 		self.batch_size = batch_size
-		self.minibatch_size = self.batch_size # to be changed if OOM
+		self.minibatch_size = int(self.batch_size / self.minibatch_split) # to be changed if OOM
 
 	def _print_hyp(self,
 		out_count, src_ids, tgt_ids, src_id2word, tgt_id2word, seqlist):
@@ -85,6 +89,8 @@ class Trainer(object):
 
 
 	def _evaluate_batches(self, model, dataset):
+
+		# todo: return BLEU score (use BLEU to determine roll back etc)
 
 		model.eval()
 
@@ -148,7 +154,7 @@ class Trainer(object):
 						loss.eval_batch_with_mask(logps.reshape(-1, logps.size(-1)),
 							tgt_ids[:, 1:].reshape(-1), non_padding_mask_tgt[:,1:].reshape(-1))
 						loss.norm_term = 1.0 * torch.sum(non_padding_mask_tgt[:,1:])
-					loss.normalise()
+					if self.normalise_loss: loss.normalise()
 					resloss += loss.get_loss()
 					resloss_norm += 1
 
@@ -250,8 +256,9 @@ class Trainer(object):
 					tgt_ids[:,1:].reshape(-1), non_padding_mask_tgt[:,1:].reshape(-1))
 				loss.norm_term = 1.0 * torch.sum(non_padding_mask_tgt[:,1:])
 
+			# import pdb; pdb.set_trace()
 			# Backward propagation: accumulate gradient
-			loss.normalise()
+			if self.normalise_loss: loss.normalise()
 			loss.acc_loss /= n_minibatch
 			loss.backward()
 			resloss += loss.get_loss()

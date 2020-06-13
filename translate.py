@@ -83,6 +83,7 @@ def translate(test_set, load_dir, test_path_out, use_gpu,
 		with torch.no_grad():
 			for idx in range(len(evaliter)):
 				batch_items = evaliter.next()
+				print(idx+1, len(evaliter))
 
 				# load data
 				src_ids = batch_items['srcid'][0]
@@ -96,12 +97,7 @@ def translate(test_set, load_dir, test_path_out, use_gpu,
 
 				decoder_outputs, decoder_hidden, other = model(src=src_ids,
 					is_training=False, beam_width=beam_width, use_gpu=use_gpu)
-
-				# memory usage
-				mem_kb, mem_mb, mem_gb = get_memory_alloc()
-				mem_mb = round(mem_mb, 2)
-				print('Memory used: {0:.2f} MB'.format(mem_mb))
-
+					
 				# write to file
 				seqlist = other['sequence']
 				seqwords = _convert_to_words(seqlist, test_set.tgt_id2word)
@@ -123,10 +119,114 @@ def translate(test_set, load_dir, test_path_out, use_gpu,
 					else:
 						if seqrev:
 							words = words[::-1]
-						outline = ' '.join(words)
+						if test_set.use_type == 'word':
+							outline = ' '.join(words)
+						elif test_set.use_type == 'char':
+							outline = ''.join(words)
 					f.write('{}\n'.format(outline))
 
 				sys.stdout.flush()
+
+
+def translate_batch(test_set, load_dir, test_path_out, use_gpu,
+	max_seq_len, beam_width, device, seqrev=False):
+
+	"""
+		no reference tgt given - Run translation.
+		Args:
+			test_set: test dataset
+				src, tgt using the same dir
+			test_path_out: output dir
+			load_dir: model dir
+			use_gpu: on gpu/cpu
+	"""
+
+	# load model
+	# latest_checkpoint_path = Checkpoint.get_latest_checkpoint(load_dir)
+	# latest_checkpoint_path = Checkpoint.get_thirdlast_checkpoint(load_dir)
+	latest_checkpoint_path = load_dir
+	resume_checkpoint = Checkpoint.load(latest_checkpoint_path)
+
+	model = resume_checkpoint.model.to(device)
+	print('Model dir: {}'.format(latest_checkpoint_path))
+	print('Model laoded')
+
+	# reset batch_size:
+	model.max_seq_len = max_seq_len
+	print('max seq len {}'.format(model.max_seq_len))
+	sys.stdout.flush()
+
+	# load test
+	test_set.construct_batches(is_train=False)
+	evaliter = iter(test_set.iter_loader)
+	print('num batches: {}'.format(len(evaliter)))
+	print('batch_size: {}'.format(test_set.batch_size))
+
+	model.eval()
+	with torch.no_grad():
+
+		# select batch
+		n_total = len(evaliter)
+		iter_idx = 0
+		per_iter = 500 # 1892809 lines; 100/batch; 38 iterations
+		st = iter_idx * per_iter
+		ed = min((iter_idx + 1) * per_iter, n_total)
+		f = open(os.path.join(test_path_out, '{:04d}.txt'.format(iter_idx)), 'w', encoding="utf8")
+
+		for idx in range(len(evaliter)):
+			batch_items = evaliter.next()
+			if idx < st:
+				continue
+			elif idx >= ed:
+				break
+			print(idx, ed)
+
+			# load data
+			src_ids = batch_items['srcid'][0]
+			src_lengths = batch_items['srclen']
+			tgt_ids = batch_items['tgtid'][0]
+			tgt_lengths = batch_items['tgtlen']
+			src_len = max(src_lengths)
+			tgt_len = max(tgt_lengths)
+			src_ids = src_ids[:,:src_len].to(device=device)
+			tgt_ids = tgt_ids[:,:tgt_len].to(device=device)
+
+			decoder_outputs, decoder_hidden, other = model(src=src_ids,
+				is_training=False, beam_width=beam_width, use_gpu=use_gpu)
+
+			# memory usage
+			mem_kb, mem_mb, mem_gb = get_memory_alloc()
+			mem_mb = round(mem_mb, 2)
+			print('Memory used: {0:.2f} MB'.format(mem_mb))
+
+			# write to file
+			seqlist = other['sequence']
+			seqwords = _convert_to_words(seqlist, test_set.tgt_id2word)
+			for i in range(len(seqwords)):
+				if src_lengths[i] == 0:
+					continue
+				words = []
+				for word in seqwords[i]:
+					if word == '<pad>':
+						continue
+					elif word == '<spc>':
+						words.append(' ')
+					elif word == '</s>':
+						break
+					else:
+						words.append(word)
+				if len(words) == 0:
+					outline = ''
+				else:
+					if seqrev:
+						words = words[::-1]
+					if test_set.use_type == 'word':
+						outline = ' '.join(words)
+					elif test_set.use_type == 'char':
+						outline = ''.join(words)
+				f.write('{}\n'.format(outline))
+
+			sys.stdout.flush()
 
 
 def att_plot(test_set, load_dir, plot_path, use_gpu, max_seq_len, beam_width, device):
@@ -278,7 +378,7 @@ def main():
 
 	# set test mode: 1 = translate; 2 = plot
 	MODE = config['eval_mode']
-	if MODE == 2:
+	if MODE == 3:
 		max_seq_len = 32
 		batch_size = 1
 		beam_width = 1
@@ -304,7 +404,11 @@ def main():
 		translate(test_set, load_dir, test_path_out, use_gpu,
 			max_seq_len, beam_width, device, seqrev=seqrev)
 
-	elif MODE == 2:
+	if MODE == 2:
+		translate_batch(test_set, load_dir, test_path_out, use_gpu,
+			max_seq_len, beam_width, device, seqrev=seqrev)
+
+	elif MODE == 3:
 		# plotting
 		att_plot(test_set, load_dir, test_path_out, use_gpu,
 			max_seq_len, beam_width, device)

@@ -69,6 +69,7 @@ class DecRNN(nn.Module):
 
 		# load embeddings
 		if self.load_embedding:
+			# import pdb; pdb.set_trace()
 			embedding_matrix = np.random.rand(self.vocab_size_dec, self.embedding_size_dec)
 			embedding_matrix = torch.FloatTensor(load_pretrained_embedding(
 				self.word2id, embedding_matrix, self.load_embedding))
@@ -436,7 +437,7 @@ class DecRNN(nn.Module):
 
 		for _ in range(self.max_seq_len):
 
-			predicted_softmax, dec_hidden, step_attn, inflated_c_out, inflated_cell_value, _ = \
+			predicted_softmax, dec_hidden, step_attn, inflated_c_out, inflated_cell_value = \
 				self.forward_step(inflated_att_keys, inflated_att_vals, input_var_emb,
 					inflated_cell_value, dec_hidden, inflated_mask_src, inflated_prev_c)
 			inflated_prev_c = inflated_c_out

@@ -57,6 +57,7 @@ class EncRNN(nn.Module):
 
 		# load embeddings
 		if self.load_embedding:
+			# import pdb; pdb.set_trace()
 			embedding_matrix = np.random.rand(self.vocab_size_enc, self.embedding_size_enc)
 			embedding_matrix = torch.FloatTensor(load_pretrained_embedding(
 				self.word2id, embedding_matrix, self.load_embedding))

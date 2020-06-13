@@ -30,7 +30,9 @@ def load_arguments(parser):
 	parser.add_argument('--load_embedding_tgt', type=str, default=None, help='pretrained tgt embedding')
 	parser.add_argument('--use_type', type=str, default='word', help='word | char')
 
+
 	# model
+	parser.add_argument('--share_embedder', type=str, default='False', help='whether or not share embedder')
 	parser.add_argument('--embedding_size_enc', type=int, default=200, help='encoder embedding size')
 	parser.add_argument('--embedding_size_dec', type=int, default=200, help='decoder embedding size')
 	parser.add_argument('--hidden_size_enc', type=int, default=200, help='encoder hidden size')
@@ -59,7 +61,9 @@ def load_arguments(parser):
 	parser.add_argument('--num_epochs', type=int, default=10, help='number of training epoches')
 	parser.add_argument('--max_seq_len', type=int, default=32, help='maximum sequence length')
 	parser.add_argument('--batch_size', type=int, default=64, help='batch size')
+	parser.add_argument('--minibatch_split', type=int, default=1, help='split the batch to avoid OOM')
 	parser.add_argument('--learning_rate', type=float, default=0.001, help='learning rate')
+	parser.add_argument('--normalise_loss', type=str, default='True', help='normalise loss or not')
 	parser.add_argument('--teacher_forcing_ratio', type=float, default=0.0, help='ratio of teacher forcing')
 	parser.add_argument('--scheduled_sampling', type=str, default='False',
 		help='gradually turn off teacher forcing')
@@ -121,7 +125,9 @@ def main():
 					max_grad_norm=config['max_grad_norm'],
 					max_count_no_improve=config['max_count_no_improve'],
 					max_count_num_rollback=config['max_count_num_rollback'],
-					keep_num=config['keep_num'])
+					keep_num=config['keep_num'],
+					normalise_loss=config['normalise_loss'],
+					minibatch_split=config['minibatch_split'])
 
 	# load train set
 	train_path_src = config['train_path_src']
@@ -157,6 +163,7 @@ def main():
 
 	# construct model
 	seq2seq = Seq2seq(vocab_size_enc, vocab_size_dec,
+					share_embedder=config['share_embedder'],
 					embedding_size_enc=config['embedding_size_enc'],
 					embedding_size_dec=config['embedding_size_dec'],
 					embedding_dropout=config['embedding_dropout'],
@@ -182,6 +189,7 @@ def main():
 
 
 	device = check_device(config['use_gpu'])
+	t.logger.info('device:{}'.format(device))
 	seq2seq = seq2seq.to(device=device)
 
 	# run training

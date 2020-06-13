@@ -7,6 +7,7 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 
 from utils.config import PAD, EOS, BOS
+from utils.misc import check_device
 from .EncRNN import EncRNN
 from .DecRNN import DecRNN
 
@@ -21,6 +22,7 @@ class Seq2seq(nn.Module):
 		# add params
 		vocab_size_enc,
 		vocab_size_dec,
+		share_embedder=False,
 		embedding_size_enc=200,
 		embedding_size_dec=200,
 		embedding_dropout=0,
@@ -83,6 +85,11 @@ class Seq2seq(nn.Module):
 			tgt_id2word=tgt_id2word,
 			use_gpu=use_gpu
 		)
+
+		# import pdb; pdb.set_trace()
+		if share_embedder:
+			assert vocab_size_enc == vocab_size_dec
+			self.encoder.embedder_enc = self.decoder.embedder_dec
 
 
 	def check_var(self, var_name, var_val_set=None):

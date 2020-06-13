@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import torch
+import torch.utils.data
 import collections
 import codecs
 import numpy as np
@@ -169,11 +170,10 @@ class Dataset(object):
 			src_sentence = self.src_sentences[idx]
 			tgt_sentence = self.tgt_sentences[idx]
 
+			src_words = src_sentence.strip().split()
 			if self.use_type == 'char':
-				src_words = src_sentence.strip()
 				tgt_words = tgt_sentence.strip()
 			elif self.use_type == 'word':
-				src_words = src_sentence.strip().split()
 				tgt_words = tgt_sentence.strip().split()
 
 			# ignore long seq of words
@@ -183,8 +183,8 @@ class Dataset(object):
 				continue
 
 			# emtry seq
-			if len(src_words) == 0 or len(tgt_words) == 0:
-				continue
+			# if len(src_words) == 0 or len(tgt_words) == 0:
+			# 	continue
 
 			# source
 			src_ids = []
@@ -236,6 +236,8 @@ class Dataset(object):
 				src:
 				a  SPC c a t SPC s a t SPC o n SPC t h e SPC m a t EOS PAD PAD ...
 		"""
+
+		# import pdb; pdb.set_trace()
 
 		# organise by length
 		_x = list(zip(self.src_word_ids, self.src_sentence_lengths,
@@ -289,4 +291,5 @@ def load_pretrained_embedding(word2id, embedding_matrix, embedding_path):
 	print('loaded pre-trained embedding:', embedding_path)
 	print('embedding vectors found:', counter)
 
+	# import pdb; pdb.set_trace()
 	return embedding_matrix
