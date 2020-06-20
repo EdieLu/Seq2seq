@@ -27,7 +27,6 @@ def load_arguments(parser):
 
 	# paths
 	parser.add_argument('--test_path_src', type=str, required=True, help='test src dir')
-	parser.add_argument('--test_path_tgt', type=str, required=True, help='test tgt dir')
 	parser.add_argument('--path_vocab_src', type=str, required=True, help='vocab src dir')
 	parser.add_argument('--path_vocab_tgt', type=str, required=True, help='vocab tgt dir')
 	parser.add_argument('--load', type=str, required=True, help='model load dir')
@@ -97,7 +96,7 @@ def translate(test_set, load_dir, test_path_out, use_gpu,
 
 				decoder_outputs, decoder_hidden, other = model(src=src_ids,
 					is_training=False, beam_width=beam_width, use_gpu=use_gpu)
-					
+
 				# write to file
 				seqlist = other['sequence']
 				seqwords = _convert_to_words(seqlist, test_set.tgt_id2word)
@@ -359,7 +358,7 @@ def main():
 
 	# load src-tgt pair
 	test_path_src = config['test_path_src']
-	test_path_tgt = config['test_path_tgt']
+	test_path_tgt = test_path_src # dummy
 	path_vocab_src = config['path_vocab_src']
 	path_vocab_tgt = config['path_vocab_tgt']
 	test_path_out = config['test_path_out']

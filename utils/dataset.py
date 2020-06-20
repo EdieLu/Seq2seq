@@ -18,7 +18,6 @@ class IterDataset(torch.utils.data.Dataset):
 
 	"""
 		load features from
-
 		'src_word_ids':src_word_ids[i_start:i_end],
 		'src_sentence_lengths':src_sentence_lengths[i_start:i_end],
 		'tgt_word_ids':tgt_word_ids[i_start:i_end],
@@ -144,7 +143,6 @@ class Dataset(object):
 	def preprocess(self):
 
 		"""
-
 			Use:
 				map word2id once for all epoches (improved data loading efficiency)
 				shuffling is done later

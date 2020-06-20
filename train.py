@@ -1,5 +1,4 @@
 import torch
-import torch.utils.tensorboard
 import random
 import time
 import os
@@ -42,7 +41,7 @@ def load_arguments(parser):
 	parser.add_argument('--num_unilstm_dec', type=int, default=2, help='number of encoder bilstm layers')
 	parser.add_argument('--residual', type=str, default='False', help='residual connection')
 	parser.add_argument('--att_mode', type=str, default='bahdanau',
-		help='attention mechanism mode - bahdanau / hybrid / dot_prod')
+		help='attention mechanism mode - bahdanau / hybrid / bilinear')
 	parser.add_argument('--hidden_size_att', type=int, default=1,
 		help='hidden size for bahdanau / hybrid attention')
 	parser.add_argument('--hidden_size_shared', type=int, default=200,
