@@ -6,8 +6,8 @@ echo $HOSTNAME
 unset LD_PRELOAD # overwrite env
 export PATH=/home/mifs/ytl28/anaconda3/bin/:$PATH
 
-export CUDA_VISIBLE_DEVICES=0 # if using qsub
-# export CUDA_VISIBLE_DEVICES=$X_SGE_CUDA_DEVICE # if using dev machines
+export CUDA_VISIBLE_DEVICES=0 # if using dev machines
+# export CUDA_VISIBLE_DEVICES=$X_SGE_CUDA_DEVICE # if using qsub
 echo $CUDA_VISIBLE_DEVICES
 
 # activate your conda env

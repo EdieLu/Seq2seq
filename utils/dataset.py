@@ -7,7 +7,6 @@ import collections
 import codecs
 import numpy as np
 import random
-from bpemb import BPEmb
 
 from utils.config import PAD, UNK, BOS, EOS, SPC
 
