@@ -1,23 +1,25 @@
 #!/bin/bash
 #$ -S /bin/bash
 
+# ------------------------ ENV --------------------------
 echo $HOSTNAME
-unset LD_PRELOAD
+unset LD_PRELOAD # overwrite env
 export PATH=/home/mifs/ytl28/anaconda3/bin/:$PATH
 
-export CUDA_VISIBLE_DEVICES=0
-# export CUDA_VISIBLE_DEVICES=$X_SGE_CUDA_DEVICE
+export CUDA_VISIBLE_DEVICES=0 # if using qsub
+# export CUDA_VISIBLE_DEVICES=$X_SGE_CUDA_DEVICE # if using dev machines
 echo $CUDA_VISIBLE_DEVICES
 
+# activate your conda env
 # python 3.6
-# pytorch 1.3
+# pytorch 1.1/1.3
 source activate py13-cuda9
 export PYTHONBIN=/home/mifs/ytl28/anaconda3/envs/py13-cuda9/bin/python3
 # source activate pt11-cuda9
 # export PYTHONBIN=/home/mifs/ytl28/anaconda3/envs/pt11-cuda9/bin/python3
 
 # ------------------------ DIR --------------------------
-savedir=models/gec-v016/
+savedir=models/gec-debug/
 train_path_src=/home/alta/BLTSpeaking/exp-ytl28/projects/lib/clc/train.src.nodot
 train_path_tgt=/home/alta/BLTSpeaking/exp-ytl28/projects/lib/clc/train.tgt.nodot
 # dev_path_src=/home/alta/BLTSpeaking/exp-ytl28/projects/lib/clc/dev.src

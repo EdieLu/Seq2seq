@@ -6,6 +6,7 @@ Standard encoder-decoder NMT (following Google’s Neural Machine Translation Sy
 
 - python 3.6
 - torch 1.2
+- tensorboard 1.14+
 - CUDA 9
 
 ## Data

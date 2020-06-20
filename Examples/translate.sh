@@ -6,18 +6,19 @@ echo $HOSTNAME
 export PATH=/home/mifs/ytl28/anaconda3/bin/:$PATH
 
 # export CUDA_VISIBLE_DEVICES=$X_SGE_CUDA_DEVICE
-export CUDA_VISIBLE_DEVICES=1
+export CUDA_VISIBLE_DEVICES=0
 echo $CUDA_VISIBLE_DEVICES
 
 # python 3.6
 # pytorch 1.1
-source activate pt11-cuda9
-export PYTHONBIN=/home/mifs/ytl28/anaconda3/envs/pt11-cuda9/bin/python3
+# source activate pt11-cuda9
+# export PYTHONBIN=/home/mifs/ytl28/anaconda3/envs/pt11-cuda9/bin/python3
 # source activate py13-cuda9
 # export PYTHONBIN=/home/mifs/ytl28/anaconda3/envs/py13-cuda9/bin/python3
+source activate pt12-cuda10
+export PYTHONBIN=/home/mifs/ytl28/anaconda3/envs/pt12-cuda10/bin/python3
 
 # ----- dir ------
-model=models/gec-v014
 path_vocab_src=/home/alta/BLTSpeaking/exp-ytl28/encdec/lib/vocab/clctotal+swbd.min-count4.en
 path_vocab_tgt=/home/alta/BLTSpeaking/exp-ytl28/encdec/lib/vocab/clctotal+swbd.min-count4.en
 use_type='word'
@@ -45,9 +46,9 @@ libbase=/home/alta/BLTSpeaking/exp-ytl28/encdec/lib-bpe
 # ftst=$libbase/dtal/nobpe/dtal.src
 # seqlen=165
 
-# fname=test_eval3 # default segauto
-# ftst=$libbase/eval3/nobpe/eval3.src
-# seqlen=145
+fname=test_dtal_asr # default seg manual
+ftst=/home/alta/BLTSpeaking/exp-ytl28/projects/lib/gec-dtal-asr/dtal-asr.src
+seqlen=165
 
 # ------ [after dd] ------
 # fname=test_fce_test_afterdd
@@ -62,9 +63,9 @@ libbase=/home/alta/BLTSpeaking/exp-ytl28/encdec/lib-bpe
 # ftst=/home/alta/BLTSpeaking/exp-ytl28/projects/lib/gec-nict/nict.flt
 # seqlen=85
 
-fname=test_nict_new_afterdd
-ftst=/home/alta/BLTSpeaking/exp-ytl28/projects/lib/gec-nict-new/nict.flt.auto
-seqlen=85
+# fname=test_nict_new_afterdd
+# ftst=/home/alta/BLTSpeaking/exp-ytl28/projects/lib/gec-nict-new/nict.flt.auto
+# seqlen=85
 
 # fname=test_dtal_afterdd
 # ftst=/home/alta/BLTSpeaking/exp-ytl28/projects/lib/gec-dtal/dtal.flt
@@ -73,14 +74,14 @@ seqlen=85
 
 # ----- models ------
 # export ckpt=$1
-ckpt=19
+model=models/gec-v011
+ckpt=18
 beam_width=1
 batch_size=500
 use_gpu=True
 
 $PYTHONBIN /home/alta/BLTSpeaking/exp-ytl28/local-ytl/nmt-base/translate.py \
     --test_path_src $ftst \
-    --test_path_tgt $ftst \
     --seqrev False \
     --path_vocab_src $path_vocab_src \
     --path_vocab_tgt $path_vocab_tgt \

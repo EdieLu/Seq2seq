@@ -35,17 +35,17 @@ libbase=/home/alta/BLTSpeaking/exp-ytl28/encdec/lib-bpe
 # ftst=/home/alta/BLTSpeaking/exp-ytl28/projects/lib/gec-nict/nict.src
 # seqlen=85
 
-fname=test_nict_new
-ftst=/home/alta/BLTSpeaking/exp-ytl28/projects/lib/gec-nict-new/nict.src
-seqlen=85
+# fname=test_nict_new
+# ftst=/home/alta/BLTSpeaking/exp-ytl28/projects/lib/gec-nict-new/nict.src
+# seqlen=85
 
 # fname=test_dtal
 # ftst=$libbase/dtal/nobpe/dtal.src
 # seqlen=165
 
-# fname=test_eval3 # default segauto
-# ftst=$libbase/eval3/nobpe/eval3.src
-# seqlen=145
+fname=test_dtal_asr # default seg manual
+ftst=/home/alta/BLTSpeaking/exp-ytl28/projects/lib/gec-dtal-asr/dtal-asr.src
+seqlen=165
 
 # ----- models ------
 beam_width=1
