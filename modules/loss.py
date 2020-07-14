@@ -41,12 +41,12 @@ class Loss(object):
 		# accumulated loss
 		self.acc_loss = 0
 		# normalization term
-		self.norm_term = 0
+		self.norm_term = 1
 
 	def reset(self):
 		""" Reset the accumulated loss. """
 		self.acc_loss = 0
-		self.norm_term = 0
+		self.norm_term = 1
 
 	def get_loss(self):
 		""" Get the loss.
@@ -123,12 +123,10 @@ class NLLLoss(Loss):
 
 	def eval_batch(self, outputs, target):
 		self.acc_loss += torch.sum(self.criterion(outputs, target))
-		self.norm_term += 1
 
 	def eval_batch_with_mask(self, outputs, target, mask):
 		masked_loss = self.criterion(outputs, target).masked_select(mask)
 		self.acc_loss += masked_loss.sum()
-		self.norm_term += 1
 
 
 class BCELoss(Loss):
@@ -156,12 +154,10 @@ class BCELoss(Loss):
 
 	def eval_batch(self, outputs, target):
 		self.acc_loss += torch.sum(self.criterion(outputs, target))
-		self.norm_term += 1
 
 	def eval_batch_with_mask(self, outputs, target, mask):
 		masked_loss = self.criterion(outputs, target).masked_select(mask)
 		self.acc_loss += masked_loss.sum()
-		self.norm_term += 1
 
 
 class CrossEntropyLoss(Loss):
@@ -189,9 +185,7 @@ class CrossEntropyLoss(Loss):
 
 	def eval_batch(self, outputs, target):
 		self.acc_loss += torch.sum(self.criterion(outputs, target))
-		self.norm_term += 1
 
 	def eval_batch_with_mask(self, outputs, target, mask):
 		masked_loss = self.criterion(outputs, target).masked_select(mask)
 		self.acc_loss += masked_loss.sum()
-		self.norm_term += 1

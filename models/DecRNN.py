@@ -226,6 +226,7 @@ class DecRNN(nn.Module):
 			predicted    =     w1 w2 w3 </s> <pad> <pad> <pad>   [max_seq_len - 1]
 
 		"""
+		# import pdb; pdb.set_trace()
 		if not is_training:
 			use_teacher_forcing = False
 		elif random.random() < teacher_forcing_ratio:
@@ -677,7 +678,8 @@ def get_base_hidden(hidden):
 def _inflate(tensor, times, dim):
 
 	"""
-		Given a tensor, 'inflates' it along the given dimension by replicating each slice specified number of times (in-place)
+		Given a tensor, 'inflates' it along the given dimension by
+		replicating each slice specified number of times (in-place)
 		Args:
 			tensor: A :class:`Tensor` to inflate
 			times: number of repetitions

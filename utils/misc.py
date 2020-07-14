@@ -158,8 +158,6 @@ def check_srctgt(src_ids, tgt_ids, src_id2word, tgt_id2word):
 	for i in range(min(3,len(src_ids))):
 		srcseq = []
 		tgtseq = []
-		# print(src_ids[i])
-		# print(tgt_ids[i])
 		for j in range(len(src_ids[0])):
 			srcseq.append(src_id2word[src_ids[i][j]])
 			tgtseq.append(src_id2word[tgt_ids[i][j]])
@@ -243,8 +241,8 @@ def _del_var(model):
 def plot_alignment(alignment, path, src, hyp, ref=None):
 
 	"""
-		plot att alignment -
-		adapted from: https://gitlab.com/Josh-ES/tacotron/blob/master/tacotron/utils/plot.py
+	plot att alignment -
+	adapted from: https://gitlab.com/Josh-ES/tacotron/blob/master/tacotron/utils/plot.py
 	"""
 
 	fig, ax = plt.subplots(figsize=(12, 10))
@@ -275,7 +273,8 @@ def plot_alignment(alignment, path, src, hyp, ref=None):
 def _inflate(tensor, times, dim):
 
 	"""
-		Given a tensor, 'inflates' it along the given dimension by replicating each slice specified number of times (in-place)
+		Given a tensor, 'inflates' it along the given dimension
+		by replicating each slice specified number of times (in-place)
 		Args:
 			tensor: A :class:`Tensor` to inflate
 			times: number of repetitions
@@ -336,13 +335,5 @@ def convert_dd_att_ref(labs):
 	outs.append(dummy) # ensure 32 out
 	outs_pad = torch.nn.utils.rnn.pad_sequence(outs, batch_first=True)
 	res = outs_pad[:-1,:]
-
-	# print(labs)
-	# print(outs)
-	# print(outs_pad.size())
-	# print(outs_pad[:-1,:].size())
-
-	# print(res)
-	# input('...')
 
 	return res

@@ -57,7 +57,7 @@ def load_arguments(parser):
 	# train
 	parser.add_argument('--random_seed', type=int, default=666, help='random seed')
 	parser.add_argument('--use_gpu', type=str, default='False', help='whether or not using GPU')
-	parser.add_argument('--num_epochs', type=int, default=10, help='number of training epoches')
+	parser.add_argument('--num_epochs', type=int, default=10, help='number of training epochs')
 	parser.add_argument('--max_seq_len', type=int, default=32, help='maximum sequence length')
 	parser.add_argument('--batch_size', type=int, default=64, help='batch size')
 	parser.add_argument('--minibatch_split', type=int, default=1, help='split the batch to avoid OOM')
@@ -134,7 +134,7 @@ def main():
 	path_vocab_src = config['path_vocab_src']
 	path_vocab_tgt = config['path_vocab_tgt']
 	train_set = Dataset(train_path_src, train_path_tgt,
-		path_vocab_src, path_vocab_tgt,
+		path_vocab_src=path_vocab_src, path_vocab_tgt=path_vocab_tgt,
 		seqrev=config['seqrev'],
 		max_seq_len=config['max_seq_len'],
 		batch_size=config['batch_size'],
@@ -150,7 +150,7 @@ def main():
 		dev_path_src = config['dev_path_src']
 		dev_path_tgt = config['dev_path_tgt']
 		dev_set = Dataset(dev_path_src, dev_path_tgt,
-			path_vocab_src, path_vocab_tgt,
+			path_vocab_src=path_vocab_src, path_vocab_tgt=path_vocab_tgt,
 			seqrev=config['seqrev'],
 			max_seq_len=config['max_seq_len'],
 			batch_size=config['batch_size'],

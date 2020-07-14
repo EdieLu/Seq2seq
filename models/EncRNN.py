@@ -103,12 +103,15 @@ class EncRNN(nn.Module):
 			setattr(self, var_name, var_val)
 
 
-	def forward(self, src, hidden=None, use_gpu=True):
+	def forward(self, src, src_lens=None, hidden=None, use_gpu=True):
 
 		"""
 			Args:
 				src: list of src word_ids [batch_size, seq_len, word_ids]
 		"""
+
+		# import pdb; pdb.set_trace()
+		# src_lens=None 
 
 		device = check_device(use_gpu)
 
@@ -121,7 +124,17 @@ class EncRNN(nn.Module):
 		emb_src = self.embedding_dropout(self.embedder_enc(src))
 
 		# run enc
-		enc_outputs, enc_hidden = self.enc(emb_src, hidden)
+		# bilstm: pack paded seq. for bilstm (rm impact of padding)
+		if type(src_lens) != type(None):
+			src_lens = torch.cat(src_lens)
+			emb_src_pack = torch.nn.utils.rnn.pack_padded_sequence(emb_src,
+				src_lens, batch_first=True, enforce_sorted=False)
+			enc_outputs_pack, enc_hidden = self.enc(emb_src_pack, hidden)
+			enc_outputs, _ = torch.nn.utils.rnn.pad_packed_sequence(
+				enc_outputs_pack, batch_first=True)
+		else:
+			enc_outputs, enc_hidden = self.enc(emb_src, hidden)
+		# unilstm
 		enc_outputs = self.dropout(enc_outputs)\
 			.view(batch_size, seq_len, enc_outputs.size(-1))
 

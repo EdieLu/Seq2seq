@@ -63,8 +63,10 @@ class Dataset(object):
 		# add params
 		path_src,
 		path_tgt,
-		path_vocab_src,
-		path_vocab_tgt,
+		path_vocab_src=None,
+		path_vocab_tgt=None,
+		vocab_src_list=None,
+		vocab_tgt_list=None,
 		max_seq_len=32,
 		batch_size=64,
 		use_gpu=True,
@@ -79,6 +81,8 @@ class Dataset(object):
 		self.path_tgt = path_tgt
 		self.path_vocab_src = path_vocab_src
 		self.path_vocab_tgt = path_vocab_tgt
+		self.vocab_src_list = vocab_src_list
+		self.vocab_tgt_list = vocab_tgt_list
 		self.max_seq_len = max_seq_len
 		self.batch_size = batch_size
 		self.use_gpu = use_gpu
@@ -98,27 +102,47 @@ class Dataset(object):
 
 		self.vocab_src = []
 		self.vocab_tgt = []
-		with codecs.open(self.path_vocab_src, encoding='UTF-8') as f:
-			vocab_src_lines	= f.readlines()
-		with codecs.open(self.path_vocab_tgt, encoding='UTF-8') as f:
-			vocab_tgt_lines = f.readlines()
 
 		self.src_word2id = collections.OrderedDict()
 		self.tgt_word2id = collections.OrderedDict()
 		self.src_id2word = collections.OrderedDict()
 		self.tgt_id2word = collections.OrderedDict()
 
-		for i, word in enumerate(vocab_src_lines):
-			word = word.strip().split()[0] # remove \n
-			self.vocab_src.append(word)
-			self.src_word2id[word] = i
-			self.src_id2word[i] = word
+		if type(self.path_vocab_src) != type(None) and type(self.path_vocab_tgt) != type(None):
+			# load from path
+			with codecs.open(self.path_vocab_src, encoding='UTF-8') as f:
+				vocab_src_lines	= f.readlines()
+			with codecs.open(self.path_vocab_tgt, encoding='UTF-8') as f:
+				vocab_tgt_lines = f.readlines()
 
-		for i, word in enumerate(vocab_tgt_lines):
-			word = word.strip().split()[0] # remove \n
-			self.vocab_tgt.append(word)
-			self.tgt_word2id[word] = i
-			self.tgt_id2word[i] = word
+			for i, word in enumerate(vocab_src_lines):
+				word = word.strip().split()[0] # remove \n
+				self.vocab_src.append(word)
+				self.src_word2id[word] = i
+				self.src_id2word[i] = word
+
+			for i, word in enumerate(vocab_tgt_lines):
+				word = word.strip().split()[0] # remove \n
+				self.vocab_tgt.append(word)
+				self.tgt_word2id[word] = i
+				self.tgt_id2word[i] = word
+
+		else:
+			# load from saved vocab list
+			assert type(self.vocab_src_list) != type(None)
+			assert type(self.vocab_tgt_list) != type(None)
+
+			for i in range(len(self.vocab_src_list)):
+				word = self.vocab_src_list[i]
+				self.vocab_src.append(word)
+				self.src_word2id[word] = i
+				self.src_id2word[i] = word
+
+			for i in range(len(self.vocab_tgt_list)):
+				word = self.vocab_tgt_list[i]
+				self.vocab_tgt.append(word)
+				self.tgt_word2id[word] = i
+				self.tgt_id2word[i] = word
 
 
 	def load_sentences(self):
@@ -143,7 +167,7 @@ class Dataset(object):
 
 		"""
 			Use:
-				map word2id once for all epoches (improved data loading efficiency)
+				map word2id once for all epochs (improved data loading efficiency)
 				shuffling is done later
 			Create:
 				self.src_word_ids

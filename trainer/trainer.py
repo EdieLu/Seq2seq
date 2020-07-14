@@ -142,7 +142,8 @@ class Trainer(object):
 
 					# run model
 					decoder_outputs, decoder_hidden, other = model(
-						src_ids, tgt_ids, is_training=False, use_gpu=self.use_gpu)
+						src_ids, src_lens=src_lengths, tgt=tgt_ids,
+						is_training=False, use_gpu=self.use_gpu)
 
 					# evaluation
 					logps = torch.stack(decoder_outputs, dim=1).to(device=self.device)
@@ -241,9 +242,9 @@ class Trainer(object):
 			non_padding_mask_tgt = tgt_ids.data.ne(PAD)
 
 			# Forward propagation
-			decoder_outputs, decoder_hidden, ret_dict = model(src_ids, tgt_ids,
-				is_training=True, teacher_forcing_ratio=teacher_forcing_ratio,
-				use_gpu=self.use_gpu)
+			decoder_outputs, decoder_hidden, ret_dict = model(src_ids,
+				src_lens=src_lengths, tgt=tgt_ids, is_training=True,
+				teacher_forcing_ratio=teacher_forcing_ratio, use_gpu=self.use_gpu)
 
 			# Get loss
 			logps = torch.stack(decoder_outputs, dim=1).to(device=self.device)
@@ -271,7 +272,7 @@ class Trainer(object):
 		return resloss
 
 
-	def _train_epoches(self,
+	def _train_epochs(self,
 		train_set, model, n_epochs, start_epoch, start_step, dev_set=None):
 
 		log = self.logger
@@ -517,6 +518,6 @@ class Trainer(object):
 		self.logger.info("Optimizer: %s, Scheduler: %s" %
 			(self.optimizer.optimizer, self.optimizer.scheduler))
 
-		self._train_epoches(train_set, model, num_epochs, start_epoch, step, dev_set=dev_set)
+		self._train_epochs(train_set, model, num_epochs, start_epoch, step, dev_set=dev_set)
 
 		return model

@@ -103,7 +103,7 @@ class Seq2seq(nn.Module):
 			setattr(self, var_name, var_val)
 
 
-	def forward(self, src, tgt=None,
+	def forward(self, src, src_lens=None, tgt=None,
 		hidden=None, is_training=False, teacher_forcing_ratio=1.0,
 		beam_width=1, use_gpu=True):
 
@@ -120,7 +120,7 @@ class Seq2seq(nn.Module):
 				ret_dict
 		"""
 
-		enc_outputs = self.encoder(src, use_gpu=use_gpu)
+		enc_outputs = self.encoder(src, src_lens=src_lens, use_gpu=use_gpu)
 		decoder_outputs, dec_hidden, ret_dict = self.decoder(
 			enc_outputs, src, tgt=tgt,
 			is_training=is_training,
