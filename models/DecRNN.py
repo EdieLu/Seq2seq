@@ -39,12 +39,10 @@ class DecRNN(nn.Module):
 		max_seq_len=32,
 		load_embedding_tgt=None,
 		tgt_word2id=None,
-		tgt_id2word=None,
-		use_gpu=False
+		tgt_id2word=None
 		):
 
 		super(DecRNN, self).__init__()
-		device = check_device(use_gpu)
 
 		# define embeddings
 		self.vocab_size_dec = vocab_size_dec

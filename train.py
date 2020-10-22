@@ -183,8 +183,7 @@ def main():
 					tgt_word2id=train_set.tgt_word2id,
 					src_id2word=train_set.src_id2word,
 					tgt_id2word=train_set.tgt_id2word,
-					att_mode=config['att_mode'],
-					use_gpu=config['use_gpu'])
+					att_mode=config['att_mode'])
 
 
 	device = check_device(config['use_gpu'])

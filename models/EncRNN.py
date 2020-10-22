@@ -30,12 +30,10 @@ class EncRNN(nn.Module):
 		max_seq_len=32,
 		load_embedding_src=None,
 		src_word2id=None,
-		src_id2word=None,
-		use_gpu=False
+		src_id2word=None
 		):
 
 		super(EncRNN, self).__init__()
-		device = check_device(use_gpu)
 
 		# define embeddings
 		self.vocab_size_enc = vocab_size_enc
@@ -111,7 +109,7 @@ class EncRNN(nn.Module):
 		"""
 
 		# import pdb; pdb.set_trace()
-		# src_lens=None 
+		# src_lens=None
 
 		device = check_device(use_gpu)
 

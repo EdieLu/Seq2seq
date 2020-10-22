@@ -43,8 +43,7 @@ class Seq2seq(nn.Module):
 		src_id2word=None,
 		tgt_word2id=None,
 		tgt_id2word=None,
-		att_mode='bahdanau',
-		use_gpu=False
+		att_mode='bahdanau'
 		):
 
 		super(Seq2seq, self).__init__()
@@ -62,8 +61,7 @@ class Seq2seq(nn.Module):
 			max_seq_len=max_seq_len,
 			load_embedding_src=load_embedding_src,
 			src_word2id=src_word2id,
-			src_id2word=src_id2word,
-			use_gpu=use_gpu
+			src_id2word=src_id2word
 		)
 
 		self.decoder = DecRNN(
@@ -82,8 +80,7 @@ class Seq2seq(nn.Module):
 			max_seq_len=max_seq_len,
 			load_embedding_tgt=load_embedding_tgt,
 			tgt_word2id=tgt_word2id,
-			tgt_id2word=tgt_id2word,
-			use_gpu=use_gpu
+			tgt_id2word=tgt_id2word
 		)
 
 		# import pdb; pdb.set_trace()
